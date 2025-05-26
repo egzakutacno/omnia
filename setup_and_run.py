@@ -80,3 +80,10 @@ if os.path.isfile(rec_script):
     run(['python3', rec_script])
 else:
     print(f"Could not find rec.py at {rec_script}")
+
+# 9. Set all running containers to restart always
+try:
+    run(['bash', '-c', 'docker ps --format "{{.Names}}" | xargs -r -I {} docker update --restart always {}'])
+    print("Set all running containers to restart always.")
+except subprocess.CalledProcessError as e:
+    print(f"Failed to set restart policy for containers: {e}")
