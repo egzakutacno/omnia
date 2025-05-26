@@ -26,6 +26,9 @@ if not shutil.which('git'):
     run(['apt-get', 'install', '-y', 'git'])
 # docker (install or upgrade)
 run(['apt-get', 'install', '-y', 'docker.io'])
+# Start / enable Docker service
+run(['systemctl', 'daemon-reload'])
+run(['systemctl', 'enable', '--now', 'docker'])
 # python3-pip
 if not shutil.which('pip3'):
     run(['apt-get', 'install', '-y', 'python3-pip'])
@@ -74,8 +77,6 @@ run(['pip3', 'install', 'pexpect'])
 # 8. Run rec.py
 rec_script = os.path.join(dest_dir, 'rec.py')
 if os.path.isfile(rec_script):
-    # Ensure rec.py reads from home directory path
     run(['python3', rec_script])
 else:
     print(f"Could not find rec.py at {rec_script}")
-
