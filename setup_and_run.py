@@ -1,3 +1,4 @@
+```python
 import os
 import sys
 import subprocess
@@ -24,9 +25,8 @@ run(['apt-get', 'update'])
 # git
 if not shutil.which('git'):
     run(['apt-get', 'install', '-y', 'git'])
-# docker
-if not shutil.which('docker'):
-    run(['apt-get', 'install', '-y', 'docker.io'])
+# docker (install or upgrade)
+run(['apt-get', 'install', '-y', 'docker.io'])
 # python3-pip
 if not shutil.which('pip3'):
     run(['apt-get', 'install', '-y', 'python3-pip'])
@@ -52,16 +52,22 @@ print(f"Generated Dockerfile at {dockerfile_path}")
 run(['docker', 'build', '-t', 'myria-custom-image:latest', '.'])
 
 # 6. Prompt for imenik entries
-imenik_path = os.path.join(dest_dir, 'imenik.txt')
-print("\nEnter container/API pairs. Leave container name blank to finish.")
-with open(imenik_path, 'w') as f:
-    while True:
-        name = input('Container name: ').strip()
-        if not name:
-            break
-        api_key = input('API key: ').strip()
-        f.write(f"Container name: {name}\nAPI key: {api_key}\n\n")
-print(f"Written imenik to {imenik_path}")
+imenik_content = []
+print("\nEnter container/API pairs. Leave container name blank to finish and resume the app.")
+while True:
+    name = input('Container name: ').strip()
+    if not name:
+        break
+    api_key = input('API key: ').strip()
+    imenik_content.append(f"Container name: {name}\nAPI key: {api_key}\n")
+
+# Write imenik.txt both to repo and home directory
+imenik_repo = os.path.join(dest_dir, 'imenik.txt')
+imenik_home = os.path.expanduser('~/imenik.txt')
+for path in (imenik_repo, imenik_home):
+    with open(path, 'w') as f:
+        f.write("\n".join(imenik_content) + "\n")
+    print(f"Written imenik to {path}")
 
 # 7. Install Python dependencies
 run(['pip3', 'install', 'pexpect'])
@@ -69,6 +75,8 @@ run(['pip3', 'install', 'pexpect'])
 # 8. Run rec.py
 rec_script = os.path.join(dest_dir, 'rec.py')
 if os.path.isfile(rec_script):
+    # Ensure rec.py reads from home directory path
     run(['python3', rec_script])
 else:
     print(f"Could not find rec.py at {rec_script}")
+```
