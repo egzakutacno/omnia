@@ -1,4 +1,3 @@
-```python
 import os
 import sys
 import subprocess
@@ -79,4 +78,4 @@ if os.path.isfile(rec_script):
     run(['python3', rec_script])
 else:
     print(f"Could not find rec.py at {rec_script}")
-```
+
