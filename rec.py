@@ -51,7 +51,7 @@ def manage_myria_nodes(container_info):
         run_myria_node(api_key, container_name, start_command)
 
 if __name__ == "__main__":
-    imenik_path = '/root/imenik.txt'
+    imenik_path = '/root/omnia/imenik.txt'
     container_info = read_container_info(imenik_path)
     container_names = list(container_info.keys())
     print("Creating containers...")
