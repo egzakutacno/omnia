@@ -58,7 +58,7 @@ run(['docker', 'build', '-t', 'myria-custom-image:latest', '.'])
 
 # 6. Prompt for imenik entries
 imenik_content = []
-print("\nEnter container/API pairs. Leave container name blank to finish and resume the app.")
+print("\nEnter container/API pairs. IMPORTANT! Leave container name blank to finish and resume the app. IMPORTANT!")
 while True:
     name = input('Container name: ').strip()
     if not name:
