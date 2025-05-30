@@ -88,3 +88,8 @@ try:
     print("Set all running containers to restart always.")
 except subprocess.CalledProcessError as e:
     print(f"Failed to set restart policy for containers: {e}")
+except subprocess.CalledProcessError as e:
+     print(f"Failed to set restart policy for containers: {e}")
++
++# non-intrusive Telegram setup
++import notification_setup; notification_setup.prompt()    
