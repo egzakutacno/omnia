@@ -21,27 +21,29 @@ run(['sysctl', '-p', sysctl_conf])
 
 # 2. Install system dependencies
 run(['apt-get', 'update'])
-# git
+
+# Install git if missing
 if not shutil.which('git'):
     run(['apt-get', 'install', '-y', 'git'])
-# docker (install or upgrade)
+
+# Install Docker
 run(['apt-get', 'install', '-y', 'docker.io'])
-# Start / enable Docker service
 run(['systemctl', 'daemon-reload'])
 run(['systemctl', 'enable', '--now', 'docker'])
-# python3-pip
+
+# Install pip if missing
 if not shutil.which('pip3'):
     run(['apt-get', 'install', '-y', 'python3-pip'])
 
 # 3. Clone omnia repo if needed
-dest_dir = os.path.join(os.getcwd(), 'omnia')
+dest_dir = '/root/omnia'
 if not os.path.isdir(dest_dir):
     run(['git', 'clone', 'https://github.com/egzakutacno/omnia.git', dest_dir])
 else:
     print(f"Repo already cloned at {dest_dir}")
 
-# 4. Generate Dockerfile
-dockerfile_path = os.path.join(os.getcwd(), 'Dockerfile')
+# 4. Generate Dockerfile in /root/omnia
+dockerfile_path = os.path.join(dest_dir, 'Dockerfile')
 with open(dockerfile_path, 'w') as f:
     f.write(
         'FROM eniocarboni/docker-ubuntu-systemd:focal\n'
@@ -50,7 +52,8 @@ with open(dockerfile_path, 'w') as f:
     )
 print(f"Generated Dockerfile at {dockerfile_path}")
 
-# 5. Build Docker image
+# 5. Build Docker image from /root/omnia
+os.chdir(dest_dir)
 run(['docker', 'build', '-t', 'myria-custom-image:latest', '.'])
 
 # 6. Prompt for imenik entries
@@ -63,25 +66,23 @@ while True:
     api_key = input('API key: ').strip()
     imenik_content.append(f"Container name: {name}\nAPI key: {api_key}\n")
 
-# Write imenik.txt both to repo and home directory
-imenik_repo = os.path.join(dest_dir, 'imenik.txt')
-imenik_home = os.path.expanduser('~/imenik.txt')
-for path in (imenik_repo, imenik_home):
-    with open(path, 'w') as f:
-        f.write("\n".join(imenik_content) + "\n")
-    print(f"Written imenik to {path}")
+# Write imenik.txt to /root/omnia
+imenik_path = os.path.join(dest_dir, 'imenik.txt')
+with open(imenik_path, 'w') as f:
+    f.write("\n".join(imenik_content) + "\n")
+print(f"Written imenik to {imenik_path}")
 
-# 7. Install Python dependencies
+# 7. Install Python dependency
 run(['pip3', 'install', 'pexpect'])
 
-# 8. Run rec.py
+# 8. Run rec.py from /root/omnia
 rec_script = os.path.join(dest_dir, 'rec.py')
 if os.path.isfile(rec_script):
     run(['python3', rec_script])
 else:
     print(f"Could not find rec.py at {rec_script}")
 
-# 9. Set all running containers to restart always
+# 9. Set restart policy for all running containers
 try:
     run(['bash', '-c', 'docker ps --format "{{.Names}}" | xargs -r -I {} docker update --restart always {}'])
     print("Set all running containers to restart always.")
