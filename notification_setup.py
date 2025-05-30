@@ -1,4 +1,3 @@
-cd omnia
 cat > notification_setup.py << 'EOF'
 #!/usr/bin/env python3
 import json, os, subprocess, sys
