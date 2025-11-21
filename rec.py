@@ -23,8 +23,14 @@ def read_container_info(file_path):
 def create_containers(container_names):
     container_ids = []
     for name in container_names:
-        # Use the custom image here
-        cmd = f'docker run --detach --privileged --name {name} --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro myria-custom-image:latest'
+        cmd = (
+            f'docker run --detach '
+            f'--privileged '
+            f'--cgroupns=host '
+            f'--name {name} '
+            f'-v /sys/fs/cgroup:/sys/fs/cgroup:rw '
+            f'myria-custom-image:latest'
+        )
         container_id = subprocess.check_output(cmd, shell=True).decode().strip()
         container_ids.append(container_id)
     return container_ids
